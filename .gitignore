@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing and Scratch
+scratch/
+test/
+*.tmp
+*.log
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build & Cache
+dist/
+build/
+.cache/

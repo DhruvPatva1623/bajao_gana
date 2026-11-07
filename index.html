@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bajao Gana — Feel the Music & Karaoke</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Spinning DJ Disc Animated Favicon in Chrome Tab -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cstyle%3E@keyframes spin%7B100%25%7Btransform:rotate(360deg)%7D%7D.disc%7Btransform-origin:50px 50px;animation:spin 3s linear infinite%7D%3C/style%3E%3Cdefs%3E%3CradialGradient id='v' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%2312121e'/%3E%3Cstop offset='70%25' stop-color='%231f1f33'/%3E%3Cstop offset='100%25' stop-color='%23080811'/%3E%3C/radialGradient%3E%3ClinearGradient id='n' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ec4899'/%3E%3Cstop offset='50%25' stop-color='%23a855f7'/%3E%3Cstop offset='100%25' stop-color='%2306b6d4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg class='disc'%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23v)' stroke='%23ec4899' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='rgba(255,255,255,0.15)' stroke-width='0.75'/%3E%3Ccircle cx='50' cy='50' r='32' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='0.75'/%3E%3Ccircle cx='50' cy='50' r='24' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='0.75'/%3E%3Ccircle cx='50' cy='50' r='16' fill='url(%23n)'/%3E%3Ccircle cx='50' cy='50' r='5' fill='%23080811' stroke='rgba(255,255,255,0.8)' stroke-width='1.5'/%3E%3Cpath d='M10 50 A40 40 0 0 1 50 10 L45 20 A30 30 0 0 0 20 45 Z' fill='rgba(255,255,255,0.18)'/%3E%3Cpath d='M90 50 A40 40 0 0 1 50 90 L55 80 A30 30 0 0 0 80 55 Z' fill='rgba(255,255,255,0.18)'/%3E%3C/g%3E%3C/svg%3E">
+</head>
+<body>
+
+    <!-- ===== Animated Ambient BG ===== -->
+    <div class="bg-canvas" id="bgCanvas">
+        <div class="bg-gradient" id="bgGradient"></div>
+        <div class="orb orb--1"></div>
+        <div class="orb orb--2"></div>
+        <div class="orb orb--3"></div>
+        <div class="orb orb--4"></div>
+        <div class="orb orb--5"></div>
+        <!-- Floating particles rendered by JS -->
+        <canvas id="particlesCanvas"></canvas>
+    </div>
+
+    <!-- ===== APP SHELL ===== -->
+    <div class="app" id="app">
+
+        <!-- ── NAV ── -->
+        <nav class="nav glass-deep" id="mainNav">
+            <div class="nav__brand-wrap">
+                <button class="nav-drawer-btn glass-subtle" id="navPlaylistBtn" title="List of My Playlist / Queue">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+                </button>
+                <div class="nav__brand" id="brandNavBtn" title="Bajao Gana — Return Home">
+                    <div class="dj-logo-disc pulse-glow">
+                        <div class="dj-logo-disc__vinyl">
+                            <div class="dj-logo-disc__grooves"></div>
+                            <div class="dj-logo-disc__center">
+                                <span>🎵</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="brand-name">Bajao <span class="text-gradient">Gana</span></span>
+                </div>
+            </div>
+
+            <div class="nav__center">
+                <!-- Global Search -->
+                <div class="search-global glass-frost" id="searchGlobal">
+                    <svg class="search-global__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInput" class="search-global__input" placeholder="Search any song, artist, YouTube or Spotify link..." autocomplete="off" spellcheck="false">
+                    <div class="search-global__shortcut glass-subtle">⌘K</div>
+                </div>
+
+                <!-- ── SEARCH SUGGESTIONS DROPDOWN ── -->
+                <div class="suggestions glass-deep" id="suggestionsPanel" style="display:none;">
+                    <div class="suggestions__header">
+                        <span class="suggestions__label">Search Results</span>
+                        <button class="suggestions__close" id="suggestionsClose">✕</button>
+                    </div>
+                    <div class="suggestions__list" id="suggestionsList"></div>
+                </div>
+            </div>
+
+            <div class="nav__right">
+                <div class="nav__tabs-group">
+                    <button class="nav-tab active glass-subtle" id="navHomeTab" title="Home Screen">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        <span>Home</span>
+                    </button>
+                    <button class="nav-tab glass-subtle" id="navPlayerTab" title="Song Page / Full Player">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                        <span>Song Page</span>
+                    </button>
+                    <button class="nav-tab glass-subtle" id="navKaraokeTab" title="Karaoke Mode">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                        <span>Karaoke</span>
+                    </button>
+                </div>
+                <button class="nav-btn glass-subtle" id="queueToggleBtn" title="Queue / Playlist">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    <span class="queue-badge" id="queueBadge" style="display:none;">0</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- ===================== COLLECTION DRAWER (Far-Left Slide-out) ===================== -->
+        <div class="collection-overlay" id="collectionOverlay" style="display:none;"></div>
+        <aside class="collection-drawer glass-deep" id="collectionDrawer">
+            <div class="collection-drawer__header">
+                <div class="collection-drawer__title-wrap">
+                    <span class="collection-drawer__icon">📀</span>
+                    <h3 class="collection-drawer__title">Vinyl Collection</h3>
+                </div>
+                <button class="icon-btn glass-subtle" id="collectionCloseBtn" title="Close Collection">✕</button>
+            </div>
+            <p class="collection-drawer__sub">Your vinyl disc crate • Hover disc out</p>
+
+            <div class="collection-drawer__list" id="collectionList">
+                <!-- Disc 1 -->
+                <div class="disk-rack-card" data-id="BddP6PYo2gs" data-title="Kesariya — Brahmāstra" data-channel="Arijit Singh" data-thumb="https://i.ytimg.com/vi/BddP6PYo2gs/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/BddP6PYo2gs/mqdefault.jpg" alt="Kesariya" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">Kesariya</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/BddP6PYo2gs/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+
+                <!-- Disc 2 -->
+                <div class="disk-rack-card" data-id="4NRXx6U8ABQ" data-title="Blinding Lights" data-channel="The Weeknd" data-thumb="https://i.ytimg.com/vi/4NRXx6U8ABQ/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/4NRXx6U8ABQ/mqdefault.jpg" alt="Blinding Lights" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">Blinding Lights</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/4NRXx6U8ABQ/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+
+                <!-- Disc 3 -->
+                <div class="disk-rack-card" data-id="dCmp56tSSmA" data-title="With You" data-channel="AP Dhillon" data-thumb="https://i.ytimg.com/vi/dCmp56tSSmA/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/dCmp56tSSmA/mqdefault.jpg" alt="With You" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">With You</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/dCmp56tSSmA/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+
+                <!-- Disc 4 -->
+                <div class="disk-rack-card" data-id="7wtfhZwyrcc" data-title="Believer" data-channel="Imagine Dragons" data-thumb="https://i.ytimg.com/vi/7wtfhZwyrcc/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/7wtfhZwyrcc/mqdefault.jpg" alt="Believer" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">Believer</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/7wtfhZwyrcc/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+
+                <!-- Disc 5 -->
+                <div class="disk-rack-card" data-id="5NV6Rdv1a3I" data-title="Get Lucky" data-channel="Daft Punk" data-thumb="https://i.ytimg.com/vi/5NV6Rdv1a3I/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/5NV6Rdv1a3I/mqdefault.jpg" alt="Get Lucky" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">Get Lucky</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/5NV6Rdv1a3I/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+
+                <!-- Disc 6 -->
+                <div class="disk-rack-card" data-id="sBzrzS1Ag_g" data-title="The Less I Know The Better" data-channel="Tame Impala" data-thumb="https://i.ytimg.com/vi/sBzrzS1Ag_g/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/sBzrzS1Ag_g/mqdefault.jpg" alt="Tame Impala" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">Tame Impala</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/sBzrzS1Ag_g/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+
+                <!-- Disc 7 -->
+                <div class="disk-rack-card" data-id="fHI8X483mZ4" data-title="Starboy" data-channel="The Weeknd" data-thumb="https://i.ytimg.com/vi/fHI8X483mZ4/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/fHI8X483mZ4/mqdefault.jpg" alt="Starboy" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">Starboy</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/fHI8X483mZ4/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+
+                <!-- Disc 8 -->
+                <div class="disk-rack-card" data-id="Umqb9KENgmk" data-title="Tum Hi Ho" data-channel="Arijit Singh" data-thumb="https://i.ytimg.com/vi/Umqb9KENgmk/mqdefault.jpg">
+                    <div class="disk-sleeve">
+                        <img src="https://i.ytimg.com/vi/Umqb9KENgmk/mqdefault.jpg" alt="Tum Hi Ho" class="disk-sleeve__cover" loading="lazy">
+                        <div class="disk-sleeve__spine"></div>
+                        <span class="disk-sleeve__name">Tum Hi Ho</span>
+                    </div>
+                    <div class="disk-vinyl-slide">
+                        <div class="disk-vinyl-slide__grooves"></div>
+                        <div class="disk-vinyl-slide__label" style="background-image:url('https://i.ytimg.com/vi/Umqb9KENgmk/mqdefault.jpg');"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collection-drawer__footer">
+                <button class="btn btn--glass" id="collectionOpenQueueBtn" style="width:100%; justify-content:center;">
+                    <span>Open Full Queue & Playlist ➔</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Floating Left Collection Handle -->
+        <button class="collection-handle glass-frost" id="collectionHandle" title="Open Vinyl Collection (Drawer)">
+            <span>📀 Collection</span>
+        </button>
+
+        <!-- ===================== HOME SCREEN ===================== -->
+        <section class="screen home" id="homeScreen">
+            <div class="home__hero">
+                <div class="hero__text">
+                    <div class="hero__badge glass-frost">
+                        <span class="badge-dot"></span>
+                        🎧 The Ultimate Music & Karaoke Experience
+                    </div>
+                    <h1 class="hero__title">
+                        Bajao Gana.<br><span class="text-gradient text-gradient--xl">Feel Every Vibe.</span>
+                    </h1>
+                    <p class="hero__sub">
+                        Play any song or video from YouTube & Spotify. Sing along to synchronized karaoke lyrics with reactive ambient visuals.
+                    </p>
+
+                    <!-- Hero Big Search Bar -->
+                    <div class="hero__search-box glass-frost" id="heroSearchBox">
+                        <svg class="hero__search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="heroSearchInput" class="hero__search-input" placeholder="Search any song, artist, YouTube or Spotify link..." autocomplete="off" spellcheck="false">
+                        <button class="btn btn--primary btn--glow hero__search-btn" id="heroSearchGo">
+                            <span>Bajao 🎵</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="hero__actions">
+                        <button class="btn btn--glass" id="heroKaraoke">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                            Karaoke Room
+                        </button>
+                        <button class="btn btn--glass" id="heroQueueBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                            My Playlist
+                        </button>
+                        <button class="btn btn--glass" id="heroCollectionBtn">
+                            <span>📀 Collection</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive 3D DJ Turntable Deck (Spacious, Gorgeous & Interactive) -->
+                <div class="hero__visual">
+                    <div class="dj-deck glass-deep" id="djDeck">
+                        <div class="dj-deck__underglow"></div>
+                        <div class="dj-deck__topbar">
+                            <div class="dj-deck__brand-badge">
+                                <span class="dj-deck__brand-dot"></span>
+                                <span>PRO DJ DECK MK-II</span>
+                            </div>
+                            <div class="dj-deck__rpm-selector">
+                                <button class="dj-rpm-btn active" id="djRpm33">33 RPM</button>
+                                <button class="dj-rpm-btn" id="djRpm45">45 RPM</button>
+                            </div>
+                        </div>
+
+                        <div class="dj-turntable-wrap">
+                            <div class="dj-turntable" id="djTurntable">
+                                <div class="dj-vinyl" id="djVinyl">
+                                    <div class="dj-vinyl__grooves"></div>
+                                    <div class="dj-vinyl__sheen"></div>
+                                    <div class="dj-vinyl__label" id="djVinylLabel">
+                                        <div class="dj-vinyl__empty" id="djVinylEmpty">
+                                            <div class="dj-vinyl__empty-ring"></div>
+                                            <span class="dj-vinyl__empty-logo">🎵</span>
+                                            <span class="dj-vinyl__empty-title">BAJAO GANA</span>
+                                            <span class="dj-vinyl__empty-sub">33⅓ RPM • STEREO</span>
+                                        </div>
+                                        <img class="dj-vinyl__art" id="djVinylArt" src="" alt="Now Playing" style="display:none; opacity:0;">
+                                        <div class="dj-vinyl__art-sheen"></div>
+                                        <div class="dj-vinyl__label-text" id="djVinylText" style="display:none;">BAJAO GANA</div>
+                                        <div class="dj-vinyl__spindle"></div>
+                                    </div>
+                                </div>
+                                <div class="dj-tonearm" id="djTonearm" style="transform: rotate(0deg);">
+                                    <div class="dj-tonearm__base"></div>
+                                    <div class="dj-tonearm__arm"></div>
+                                    <div class="dj-tonearm__head">
+                                        <div class="dj-tonearm__stylus"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Pitch / Speed Slider -->
+                            <div class="dj-pitch-slider-wrap" title="Turntable Speed / Pitch">
+                                <span class="dj-pitch-label">+</span>
+                                <input type="range" class="dj-pitch-slider" id="djPitchSlider" min="0.75" max="1.5" step="0.05" value="1">
+                                <span class="dj-pitch-label">-</span>
+                            </div>
+                        </div>
+
+                        <div class="dj-deck__controls">
+                            <div class="dj-spectrum">
+                                <div class="dj-bar" style="--h:25%"></div>
+                                <div class="dj-bar" style="--h:45%"></div>
+                                <div class="dj-bar" style="--h:30%"></div>
+                                <div class="dj-bar" style="--h:65%"></div>
+                                <div class="dj-bar" style="--h:40%"></div>
+                                <div class="dj-bar" style="--h:55%"></div>
+                                <div class="dj-bar" style="--h:30%"></div>
+                                <div class="dj-bar" style="--h:50%"></div>
+                            </div>
+                            <div class="dj-status-badge glass-subtle">
+                                <span class="dj-live-dot" style="background:#a855f7; box-shadow:0 0 8px #a855f7;"></span>
+                                <span class="dj-status-text">READY TO SPIN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                    <!-- 🔥 Trending Hits Section -->
+                    <div class="home__section">
+                        <div class="section-head">
+                            <div>
+                                <h2 class="section-title">🔥 Trending on Bajao Gana</h2>
+                                <p class="section-sub">Click any track to play • Click + to add to playlist</p>
+                            </div>
+                        </div>
+                        <div class="trending-grid" id="trendingGrid">
+                            <!-- Card 1 -->
+                            <div class="track-card glass-frost" data-id="BddP6PYo2gs" data-title="Kesariya — Brahmāstra | Arijit Singh" data-channel="Sony Music India" data-thumb="https://i.ytimg.com/vi/BddP6PYo2gs/mqdefault.jpg">
+                                <div class="track-card__thumb-wrap">
+                                    <img class="track-card__thumb" src="https://i.ytimg.com/vi/BddP6PYo2gs/mqdefault.jpg" alt="Kesariya" loading="lazy">
+                                    <div class="track-card__play-overlay">
+                                        <div class="track-card__play-btn">▶</div>
+                                    </div>
+                                    <span class="track-card__tag">Bollywood</span>
+                                    <button class="track-card__add-btn" title="Add to Queue" data-add="true">+</button>
+                                </div>
+                                <div class="track-card__body">
+                                    <h4 class="track-card__title">Kesariya — Brahmāstra</h4>
+                                    <p class="track-card__artist">Arijit Singh, Pritam</p>
+                                </div>
+                            </div>
+
+                            <!-- Card 2 -->
+                            <div class="track-card glass-frost" data-id="4NRXx6U8ABQ" data-title="The Weeknd — Blinding Lights" data-channel="The Weeknd" data-thumb="https://i.ytimg.com/vi/4NRXx6U8ABQ/mqdefault.jpg">
+                                <div class="track-card__thumb-wrap">
+                                    <img class="track-card__thumb" src="https://i.ytimg.com/vi/4NRXx6U8ABQ/mqdefault.jpg" alt="Blinding Lights" loading="lazy">
+                                    <div class="track-card__play-overlay">
+                                        <div class="track-card__play-btn">▶</div>
+                                    </div>
+                                    <span class="track-card__tag">Global Pop</span>
+                                    <button class="track-card__add-btn" title="Add to Queue" data-add="true">+</button>
+                                </div>
+                                <div class="track-card__body">
+                                    <h4 class="track-card__title">Blinding Lights</h4>
+                                    <p class="track-card__artist">The Weeknd</p>
+                                </div>
+                            </div>
+
+                            <!-- Card 3 -->
+                            <div class="track-card glass-frost" data-id="dCmp56tSSmA" data-title="AP Dhillon — With You" data-channel="AP Dhillon" data-thumb="https://i.ytimg.com/vi/dCmp56tSSmA/mqdefault.jpg">
+                                <div class="track-card__thumb-wrap">
+                                    <img class="track-card__thumb" src="https://i.ytimg.com/vi/dCmp56tSSmA/mqdefault.jpg" alt="With You" loading="lazy">
+                                    <div class="track-card__play-overlay">
+                                        <div class="track-card__play-btn">▶</div>
+                                    </div>
+                                    <span class="track-card__tag">Punjabi</span>
+                                    <button class="track-card__add-btn" title="Add to Queue" data-add="true">+</button>
+                                </div>
+                                <div class="track-card__body">
+                                    <h4 class="track-card__title">With You</h4>
+                                    <p class="track-card__artist">AP Dhillon</p>
+                                </div>
+                            </div>
+
+                            <!-- Card 4 -->
+                            <div class="track-card glass-frost" data-id="sBzrzS1Ag_g" data-title="Tame Impala — The Less I Know The Better" data-channel="Tame Impala" data-thumb="https://i.ytimg.com/vi/sBzrzS1Ag_g/mqdefault.jpg">
+                                <div class="track-card__thumb-wrap">
+                                    <img class="track-card__thumb" src="https://i.ytimg.com/vi/sBzrzS1Ag_g/mqdefault.jpg" alt="Tame Impala" loading="lazy">
+                                    <div class="track-card__play-overlay">
+                                        <div class="track-card__play-btn">▶</div>
+                                    </div>
+                                    <span class="track-card__tag">Psychedelic</span>
+                                    <button class="track-card__add-btn" title="Add to Queue" data-add="true">+</button>
+                                </div>
+                                <div class="track-card__body">
+                                    <h4 class="track-card__title">The Less I Know The Better</h4>
+                                    <p class="track-card__artist">Tame Impala</p>
+                                </div>
+                            </div>
+
+                            <!-- Card 5 -->
+                            <div class="track-card glass-frost" data-id="5NV6Rdv1a3I" data-title="Daft Punk — Get Lucky ft. Pharrell Williams" data-channel="Daft Punk" data-thumb="https://i.ytimg.com/vi/5NV6Rdv1a3I/mqdefault.jpg">
+                                <div class="track-card__thumb-wrap">
+                                    <img class="track-card__thumb" src="https://i.ytimg.com/vi/5NV6Rdv1a3I/mqdefault.jpg" alt="Daft Punk" loading="lazy">
+                                    <div class="track-card__play-overlay">
+                                        <div class="track-card__play-btn">▶</div>
+                                    </div>
+                                    <span class="track-card__tag">Funk & Disco</span>
+                                    <button class="track-card__add-btn" title="Add to Queue" data-add="true">+</button>
+                                </div>
+                                <div class="track-card__body">
+                                    <h4 class="track-card__title">Get Lucky</h4>
+                                    <p class="track-card__artist">Daft Punk ft. Pharrell</p>
+                                </div>
+                            </div>
+
+                            <!-- Card 6 -->
+                            <div class="track-card glass-frost" data-id="7wtfhZwyrcc" data-title="Imagine Dragons — Believer" data-channel="ImagineDragons" data-thumb="https://i.ytimg.com/vi/7wtfhZwyrcc/mqdefault.jpg">
+                                <div class="track-card__thumb-wrap">
+                                    <img class="track-card__thumb" src="https://i.ytimg.com/vi/7wtfhZwyrcc/mqdefault.jpg" alt="Believer" loading="lazy">
+                                    <div class="track-card__play-overlay">
+                                        <div class="track-card__play-btn">▶</div>
+                                    </div>
+                                    <span class="track-card__tag">Anthem Rock</span>
+                                    <button class="track-card__add-btn" title="Add to Queue" data-add="true">+</button>
+                                </div>
+                                <div class="track-card__body">
+                                    <h4 class="track-card__title">Believer</h4>
+                                    <p class="track-card__artist">Imagine Dragons</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            <!-- Vibe Genres & Quick Picks -->
+            <div class="home__section">
+                <h2 class="section-title">Explore by Vibe</h2>
+                <div class="quick-chips">
+                    <button class="chip glass-frost" data-q="Arijit Singh romantic hits">🎶 Arijit Singh Hits</button>
+                    <button class="chip glass-frost" data-q="Top Punjabi hits 2024">⚡ Punjabi Bangers</button>
+                    <button class="chip glass-frost" data-q="Lofi hip hop beats to relax/study to">☕ Midnight Lo-Fi</button>
+                    <button class="chip glass-frost" data-q="The Weeknd songs">🌙 The Weeknd</button>
+                    <button class="chip glass-frost" data-q="Tame Impala best songs">🌀 Psychedelic Vibes</button>
+                    <button class="chip glass-frost" data-q="Daft Punk best hits">🤖 Retro Synth & Disco</button>
+                    <button class="chip glass-frost" data-q="AP Dhillon best tracks">🎧 AP Dhillon</button>
+                    <button class="chip glass-frost" data-q="Imagine Dragons best hits">🔥 Rock & Anthems</button>
+                    <button class="chip glass-frost" data-q="Coldplay top hits">✨ Coldplay</button>
+                </div>
+            </div>
+
+            <!-- Features -->
+            <div class="home__section">
+                <h2 class="section-title">Why Bajao Gana?</h2>
+                <div class="features-grid">
+                    <div class="feature-card glass-frost hover-lift">
+                        <div class="feature-card__icon gradient-icon">🎤</div>
+                        <h3>Pro Karaoke Room</h3>
+                        <p>Word-synced glowing lyrics that float in cinematic ambient blur. Click any line to seek.</p>
+                    </div>
+                    <div class="feature-card glass-frost hover-lift">
+                        <div class="feature-card__icon gradient-icon">🎨</div>
+                        <h3>Adaptive Aura</h3>
+                        <p>Colors, glowing orbs and backgrounds morph dynamically to match every song's visual artwork.</p>
+                    </div>
+                    <div class="feature-card glass-frost hover-lift">
+                        <div class="feature-card__icon gradient-icon">📃</div>
+                        <h3>Instant Playlists & Queue</h3>
+                        <p>Build playlists on the fly. Drag, reorder, shuffle, and auto-advance seamlessly.</p>
+                    </div>
+                    <div class="feature-card glass-frost hover-lift">
+                        <div class="feature-card__icon gradient-icon">⚡</div>
+                        <h3>Variable Speed Controls</h3>
+                        <p>Slow down to learn lyrics or speed it up — 0.5× to 2.0× variable playback speed control.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== PLAYER SCREEN ===================== -->
+        <section class="screen player screen--inactive" id="playerScreen">
+            <div class="player__layout">
+                <!-- LEFT — Video + Controls -->
+                <div class="player__main">
+                    <div class="video-frame glass-deep">
+                        <div id="youtubePlayer"></div>
+                    </div>
+
+                    <!-- Song Info -->
+                    <div class="song-info">
+                        <div class="song-info__text">
+                            <h2 class="song-info__title" id="songTitle">No song selected</h2>
+                            <p class="song-info__channel" id="songChannel"></p>
+                        </div>
+                        <div class="song-info__actions">
+                            <button class="icon-btn glass-subtle" id="songActionMiniBtn" title="Floating Mini Player (PiP)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <rect x="12" y="9" width="8" height="6" rx="1" ry="1" fill="currentColor" fill-opacity="0.35"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn glass-subtle" id="addToQueueBtn" title="Add to Queue">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            </button>
+                            <button class="icon-btn glass-subtle" id="karaokeOpenBtn" title="Karaoke Room">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="controls glass-deep">
+                        <div class="controls__progress">
+                            <span class="time" id="timeCurrent">0:00</span>
+                            <div class="progress" id="progressBar">
+                                <div class="progress__track"></div>
+                                <div class="progress__fill" id="progressFill"></div>
+                                <div class="progress__thumb" id="progressThumb"></div>
+                            </div>
+                            <span class="time" id="timeTotal">0:00</span>
+                        </div>
+                        <div class="controls__buttons">
+                            <div class="controls__left">
+                                <button class="ctrl-btn" id="loopBtn" title="Loop (L)">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                                </button>
+                                <button class="ctrl-btn" id="shuffleBtn" title="Shuffle Queue">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                                </button>
+                            </div>
+                            <div class="controls__center">
+                                <button class="ctrl-btn" id="prevTrackBtn" title="Previous">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+                                </button>
+                                <button class="ctrl-btn ctrl-btn--play" id="playPauseBtn" title="Play/Pause (Space)">
+                                    <svg class="icon-play" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+                                    <svg class="icon-pause" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                                </button>
+                                <button class="ctrl-btn" id="nextTrackBtn" title="Next">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                                </button>
+                            </div>
+                            <div class="controls__right">
+                                <div class="speed-ctrl">
+                                    <button class="ctrl-btn ctrl-btn--label" id="speedBtn" title="Speed"><span id="speedLabel">1×</span></button>
+                                    <div class="speed-menu glass-deep" id="speedMenu" style="display:none;">
+                                        <button class="speed-opt" data-speed="0.5">0.5×</button>
+                                        <button class="speed-opt" data-speed="0.75">0.75×</button>
+                                        <button class="speed-opt active" data-speed="1">1×</button>
+                                        <button class="speed-opt" data-speed="1.25">1.25×</button>
+                                        <button class="speed-opt" data-speed="1.5">1.5×</button>
+                                        <button class="speed-opt" data-speed="1.75">1.75×</button>
+                                        <button class="speed-opt" data-speed="2">2×</button>
+                                    </div>
+                                </div>
+                                <div class="volume-ctrl">
+                                    <button class="ctrl-btn" id="volumeBtn" title="Volume (M)">
+                                        <svg id="volIconHigh" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                        <svg id="volIconMute" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                                    </button>
+                                    <div class="volume-bar" id="volumeBar">
+                                        <div class="volume-bar__fill" id="volumeFill" style="width:80%"></div>
+                                    </div>
+                                </div>
+                                <!-- Dedicated Mini Player (PiP) Button (Image 7) -->
+                                <button class="ctrl-btn" id="playerMiniBtn" title="Minimize to Floating Mini Player">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                        <rect x="12" y="9" width="8" height="6" rx="1" ry="1" fill="currentColor" fill-opacity="0.35"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT — Lyrics -->
+                <div class="player__lyrics">
+                    <div class="lyrics-panel glass-deep">
+                        <div class="lyrics-panel__head">
+                            <h3>🎤 Lyrics</h3>
+                            <button class="icon-btn glass-subtle" id="lyricsExpandBtn" title="Karaoke Room">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                            </button>
+                        </div>
+                        <div class="lyrics-panel__body" id="lyricsBody">
+                            <div class="lyrics-empty" id="lyricsEmpty">
+                                <div class="lyrics-empty__anim">
+                                    <span>♪</span><span>♫</span><span>♬</span>
+                                </div>
+                                <p>Play a song to see<br>lyrics appear here</p>
+                            </div>
+                            <div class="lyrics-lines" id="lyricsLines" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== KARAOKE ROOM (Fullscreen Ambient Stage) ===================== -->
+        <div class="karaoke-room" id="karaokeRoom" style="display:none;">
+            <!-- Ambient blurred background layers -->
+            <div class="karaoke-room__bg" id="karaokeBg"></div>
+            <div class="karaoke-room__glow" id="karaokeGlow"></div>
+            <div class="karaoke-room__mesh"></div>
+
+            <div class="karaoke-room__content">
+                <!-- Top Header -->
+                <div class="karaoke-room__head">
+                    <button class="karaoke-back-btn glass-frost" id="karaokeCloseBtn" title="Back to Video Player">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+                        <span>Back</span>
+                    </button>
+                    <div class="karaoke-room__now glass-frost">
+                        <span class="karaoke-room__now-label">🎤 Karaoke Mode</span>
+                        <span class="karaoke-room__now-title" id="karaokeSongTitle">—</span>
+                    </div>
+                    <button class="icon-btn glass-frost" id="karaokeQueueBtn" title="Open Queue">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <!-- Lyrics Area -->
+                <div class="karaoke-room__lyrics" id="karaokeLyrics">
+                    <p class="karaoke-room__waiting">Play a song to begin karaoke…</p>
+                </div>
+
+                <!-- ALL CONTROLS (Full Deck) -->
+                <div class="karaoke-room__controls glass-deep" id="karaokeControlsDeck">
+                    <!-- Progress Bar Row -->
+                    <div class="controls__progress karaoke-progress-row">
+                        <span class="time" id="karaokeTimeCurrent">0:00</span>
+                        <div class="progress" id="karaokeProgressBar">
+                            <div class="progress__track"></div>
+                            <div class="progress__fill" id="karaokeProgressFill"></div>
+                            <div class="progress__thumb" id="karaokeProgressThumb"></div>
+                        </div>
+                        <span class="time" id="karaokeTimeTotal">0:00</span>
+                    </div>
+
+                    <!-- Buttons Row -->
+                    <div class="controls__buttons karaoke-buttons-row">
+                        <div class="controls__left">
+                            <button class="ctrl-btn" id="karaokeLoopBtn" title="Loop (L)">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                            </button>
+                            <button class="ctrl-btn" id="karaokeShuffleBtn" title="Shuffle Queue">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="controls__center">
+                            <button class="ctrl-btn" id="karaokePrev" title="Previous Track (← 10s)">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+                            </button>
+                            <button class="ctrl-btn ctrl-btn--play" id="karaokePlayPause" title="Play/Pause (Space)">
+                                <svg class="icon-play" width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+                                <svg class="icon-pause" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                            </button>
+                            <button class="ctrl-btn" id="karaokeNext" title="Next Track (→ 10s)">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="controls__right">
+                            <div class="speed-ctrl">
+                                <button class="ctrl-btn ctrl-btn--label" id="karaokeSpeedBtn" title="Speed">
+                                    <span id="karaokeSpeedLabel">1×</span>
+                                </button>
+                                <div class="speed-menu glass-deep" id="karaokeSpeedMenu" style="display:none;">
+                                    <button class="speed-opt" data-speed="0.5">0.5×</button>
+                                    <button class="speed-opt" data-speed="0.75">0.75×</button>
+                                    <button class="speed-opt active" data-speed="1">1×</button>
+                                    <button class="speed-opt" data-speed="1.25">1.25×</button>
+                                    <button class="speed-opt" data-speed="1.5">1.5×</button>
+                                    <button class="speed-opt" data-speed="1.75">1.75×</button>
+                                    <button class="speed-opt" data-speed="2">2×</button>
+                                </div>
+                            </div>
+                            <div class="volume-ctrl">
+                                <button class="ctrl-btn" id="karaokeVolumeBtn" title="Mute (M)">
+                                    <svg class="k-vol-high" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                    <svg class="k-vol-mute" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                                </button>
+                                <div class="volume-bar" id="karaokeVolumeBar">
+                                    <div class="volume-bar__fill" id="karaokeVolumeFill" style="width:80%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================== QUEUE SIDEBAR ===================== -->
+        <div class="queue-overlay" id="queueOverlay" style="display:none;"></div>
+        <aside class="queue-panel glass-deep" id="queuePanel">
+            <div class="queue-panel__head">
+                <div class="queue-panel__title-wrap">
+                    <h3>Queue</h3>
+                    <span class="queue-count-pill" id="queueCountPill">0 songs</span>
+                </div>
+                <div class="queue-panel__actions">
+                    <button class="icon-btn glass-subtle" id="queuePanelShuffleBtn" title="Shuffle All">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                    </button>
+                    <button class="icon-btn glass-subtle" id="clearQueueBtn" title="Clear Entire Queue">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                    <button class="icon-btn glass-subtle" id="queueCloseBtn" title="Close">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Add Bar inside Queue Panel (Image 2) -->
+            <div class="queue-quick-add">
+                <input type="text" id="queueAddInput" class="queue-quick-add__input" placeholder="Type song name or YouTube link..." autocomplete="off">
+                <button class="queue-quick-add__btn" id="queueAddBtn" title="Add song to queue">+ Add</button>
+            </div>
+
+            <!-- Queue Quick Toolbar: All Songs / Loop Toggle -->
+            <div class="queue-toolbar">
+                <span class="queue-toolbar__tag">Quick Controls</span>
+                <button class="queue-tool-btn" id="queueLoopToggleBtn" title="Toggle Queue Loop">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                    <span>Loop: <b id="queueLoopStatus">Off</b></span>
+                </button>
+            </div>
+
+            <!-- All Settings Drawer Card (Image 8: "All setting") -->
+            <div class="queue-settings-card glass-subtle" id="queueSettingsCard">
+                <div class="queue-settings-header" id="queueSettingsToggle" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:10px 12px;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:1.1rem;">⚙️</span>
+                        <span style="font-weight:700; font-size:0.86rem; color:#fff;">All Playback Settings</span>
+                    </div>
+                    <span id="queueSettingsChevron" style="font-size:0.75rem; color:var(--text-dim); transition:transform 0.25s;">▼</span>
+                </div>
+                <div class="queue-settings-body" id="queueSettingsBody" style="display:none; padding:4px 12px 14px; flex-direction:column; gap:12px;">
+                    <!-- Auto-play next song toggle -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.82rem;">
+                        <span style="color:var(--text-sub);">Auto-play Next (5s timer)</span>
+                        <button class="queue-setting-pill active" id="queueAutoPlayToggle" style="cursor:pointer;">ENABLED</button>
+                    </div>
+                    <!-- Speed quick selector -->
+                    <div style="display:flex; flex-direction:column; gap:6px; font-size:0.82rem;">
+                        <span style="color:var(--text-sub);">Playback Speed</span>
+                        <div class="queue-speed-pills" style="display:flex; gap:6px;">
+                            <button class="q-speed-pill" data-speed="0.75">0.75×</button>
+                            <button class="q-speed-pill active" data-speed="1">1.0×</button>
+                            <button class="q-speed-pill" data-speed="1.25">1.25×</button>
+                            <button class="q-speed-pill" data-speed="1.5">1.5×</button>
+                        </div>
+                    </div>
+                    <!-- Ambient Glow Mode -->
+                    <div style="display:flex; flex-direction:column; gap:6px; font-size:0.82rem;">
+                        <span style="color:var(--text-sub);">Ambient Visualizer Vibe</span>
+                        <div class="queue-vibe-pills" style="display:flex; gap:6px;">
+                            <button class="q-vibe-pill active" data-vibe="adaptive">Adaptive</button>
+                            <button class="q-vibe-pill" data-vibe="neon">Neon</button>
+                            <button class="q-vibe-pill" data-vibe="chill">Chill</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="queue-panel__now" id="queueNowPlaying" style="display:none;">
+                <span class="queue-panel__now-label">Now Playing</span>
+                <div class="queue-item queue-item--active" id="queueNowItem"></div>
+            </div>
+            <div class="queue-panel__label" id="queueNextLabel" style="display:none;">Next Up in Queue</div>
+            <div class="queue-panel__list" id="queueList">
+                <div class="queue-empty">
+                    <p>Your queue is empty</p>
+                    <span>Search for songs or click + above to add</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== FLOATING MINI SCREEN POPUP (PiP Player) ===== -->
+        <div class="mini-player-popup glass-deep" id="miniPlayerPopup" style="display:none;">
+            <div class="mini-player__header">
+                <div class="mini-player__status">
+                    <span class="mini-live-dot"></span>
+                    <span class="mini-status-text">BAJAO POPUP</span>
+                </div>
+                <div class="mini-player__actions">
+                    <button class="mini-btn" id="miniKaraokeBtn" title="Open Karaoke Room">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+                    </button>
+                    <button class="mini-btn" id="miniExpandBtn" title="Full Player">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    </button>
+                    <button class="mini-btn" id="miniCloseBtn" title="Minimize / Hide">✕</button>
+                </div>
+            </div>
+
+            <div class="mini-player__body">
+                <!-- Mini Video / Screen Container -->
+                <div class="mini-player__screen" id="miniPlayerScreen" title="Click to view Karaoke lyrics">
+                    <img class="mini-player__thumb" id="miniPlayerThumb" src="" alt="Thumbnail">
+                    <div class="mini-player__screen-overlay">
+                        <span class="mini-screen-play-icon">🎤 Sing</span>
+                    </div>
+                </div>
+
+                <!-- Info & Controls -->
+                <div class="mini-player__info">
+                    <div class="mini-player__title-wrap">
+                        <h4 class="mini-player__title" id="miniPlayerTitle">No song playing</h4>
+                        <p class="mini-player__artist" id="miniPlayerArtist">Select a track</p>
+                    </div>
+
+                    <!-- Mini Progress Bar -->
+                    <div class="mini-player__progress" id="miniProgressContainer">
+                        <div class="mini-player__progress-fill" id="miniProgressFill"></div>
+                    </div>
+                    <div class="mini-player__time">
+                        <span id="miniCurrentTime">0:00</span>
+                        <span id="miniTotalTime">0:00</span>
+                    </div>
+
+                    <!-- Mini Controls: Prev, Play/Pause, Next -->
+                    <div class="mini-player__controls">
+                        <button class="mini-ctrl-btn" id="miniPrevBtn" title="Seek -10s / Previous">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2.5"/></svg>
+                        </button>
+                        <button class="mini-ctrl-btn mini-ctrl-btn--play" id="miniPlayPauseBtn" title="Play / Pause">
+                            <svg class="mini-icon-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            <svg class="mini-icon-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                        </button>
+                        <button class="mini-ctrl-btn" id="miniNextBtn" title="Seek +10s / Next">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== UP NEXT AUTO-PLAY COUNTDOWN POPUP ===================== -->
+    <div class="up-next-overlay" id="upNextOverlay" style="display:none;"></div>
+    <div class="up-next-popup glass-deep" id="upNextPopup" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="upNextHeading">
+        <div class="up-next__top">
+            <div class="up-next__header-info">
+                <span class="up-next__badge">⚡ AUTO PLAYING NEXT</span>
+                <h3 class="up-next__heading" id="upNextHeading">Playing next in <span class="text-gradient" id="upNextCountdownSec">5</span>s</h3>
+            </div>
+            <!-- Circular 5s animated countdown -->
+            <div class="up-next__timer-circle-wrap">
+                <svg class="up-next__timer-svg" width="46" height="46" viewBox="0 0 46 46">
+                    <circle class="up-next__timer-bg" cx="23" cy="23" r="19"/>
+                    <circle class="up-next__timer-bar" id="upNextCircleBar" cx="23" cy="23" r="19"/>
+                </svg>
+                <span class="up-next__timer-num" id="upNextTimerNum">5</span>
+            </div>
+        </div>
+
+        <!-- Featured Next Song Card -->
+        <div class="up-next__card" id="upNextFeaturedCard">
+            <div class="up-next__thumb-wrap">
+                <img class="up-next__thumb" id="upNextThumb" src="" alt="Next Track Preview">
+                <div class="up-next__play-indicator">▶</div>
+            </div>
+            <div class="up-next__details">
+                <span class="up-next__next-tag">NEXT IN QUEUE</span>
+                <h4 class="up-next__title" id="upNextTitle">Track Name</h4>
+                <p class="up-next__artist" id="upNextArtist">Artist Name</p>
+            </div>
+            <div class="up-next__actions">
+                <button class="btn btn--primary btn--glow up-next__play-btn" id="upNextPlayNowBtn">
+                    <span>Play Now</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+                </button>
+                <button class="btn btn--glass up-next__cancel-btn" id="upNextCancelBtn">Stay / Cancel</button>
+            </div>
+        </div>
+
+        <!-- Suggested Similar Songs Grid -->
+        <div class="up-next__similar-section">
+            <div class="up-next__similar-head">
+                <span>✨ Or choose a similar song:</span>
+            </div>
+            <div class="up-next__similar-grid" id="upNextSimilarGrid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOASTS ===== -->
+    <div class="toast-rack" id="toastRack"></div>
+
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="app.js"></script>
+</body>
+</html>
